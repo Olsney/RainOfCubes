@@ -1,22 +1,25 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
+[RequireComponent(typeof(Rigidbody), typeof(Renderer))]
 public class Cube : MonoBehaviour
 {
-    // public event Action Destroyed;
-    
-    private const string PlatformTag = "Platform";
-    
-    private bool _isPlatformTouched;
+    private const float Delay = 1f;
 
-    private void Update()
+    private Rigidbody _rigidbody;
+    private Renderer _renderer;
+    private bool _isPlatformTouched;
+    private Color _defaultColor;
+
+    public event Action<Cube> Destroyed;
+
+    private void Awake()
     {
-        if (_isPlatformTouched)
-            // Destroyed?.Invoke();
-        Destroy(gameObject,GetRandomDelay());
+        _rigidbody = GetComponent<Rigidbody>();
+        _renderer = GetComponent<Renderer>();
+        _defaultColor = _renderer.material.color;
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -24,13 +27,34 @@ public class Cube : MonoBehaviour
         if (_isPlatformTouched)
             return;
 
-        if (collision.gameObject.tag != PlatformTag)
+        if (collision.gameObject.TryGetComponent<Platform>(out _) == false)
             return;
-        
-        GetComponent<Renderer>().material.color = GetRandomColor();
+
+        _renderer.material.color = GetRandomColor();
         _isPlatformTouched = true;
+
+        StartCoroutine(DestroyWithDelay());
     }
     
+    public void Init(Vector3 position)
+    {
+        if (_isPlatformTouched)
+            _isPlatformTouched = false;
+        
+        transform.position = position;
+        _rigidbody.velocity = Vector3.zero;
+        transform.rotation = Quaternion.identity;
+        _renderer.material.color = _defaultColor;
+        gameObject.SetActive(true);
+    }
+
+    private IEnumerator DestroyWithDelay()
+    {
+        yield return new WaitForSeconds(GetRandomDelay());
+
+        Destroyed?.Invoke(this);
+    }
+
     private int GetRandomDelay()
     {
         int min = 2;
@@ -39,6 +63,6 @@ public class Cube : MonoBehaviour
         return Random.Range(min, max);
     }
 
-    private Color GetRandomColor() => 
+    private Color GetRandomColor() =>
         Random.ColorHSV();
 }

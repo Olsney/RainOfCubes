@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 using Random = UnityEngine.Random;
@@ -14,40 +12,37 @@ public class CubeSpawner : MonoBehaviour
 
     private float _randomPositionX;
     private float _randomPositionZ;
-    private Vector3 _velocity = new Vector3(0f, -5f, 0f);
     private Coroutine _coroutine;
-    // private ObjectPool<Cube> _objectPool;
+    private ObjectPool<Cube> _objectPool;
 
-    // private void Awake()
-    // {
-    //     _platform.GetComponent<Platform>();
-    //     _cubePrefab.GetComponent<Cube>();
-    //     _objectPool = new ObjectPool<Cube>(
-    //         createFunc: () => Instantiate(_cubePrefab), 
-    //         actionOnGet: OnGet,
-    //         actionOnRelease: OnRelease
-    //         );
-    // }
-    //
-    // private void OnRelease(Cube cube)
-    // {
-    //     _objectPool.Release(cube);
-    //
-    //     new WaitForSeconds(GetRandomDelay());
-    //     
-    //     cube.gameObject.SetActive(false);
-    //     _objectPool.Release(cube);
-    //     Destroy(cube);
-    //     
-    // }
+    private void Awake()
+    {
+        _platform.GetComponent<Platform>();
+        _cubePrefab.GetComponent<Cube>();
+        _objectPool = new ObjectPool<Cube>(
+            createFunc: () => Instantiate(_cubePrefab), 
+            actionOnGet: OnGet,
+            actionOnRelease: OnRelease,
+            actionOnDestroy: (cube) => Destroy(cube.gameObject)
+            );
+    }
+    
+    private void OnRelease(Cube cube)
+    {
+        cube.gameObject.SetActive(false);
+        cube.Destroyed -= Release;
+    }
 
-    // private void OnGet(Cube cube)
-    // {
-    //     cube.transform.position = SetRandomPosition();
-    //     cube.GetComponent<Rigidbody>().velocity = _velocity;
-    //     cube.gameObject.SetActive(true);
-    //     _pool.Get();
-    // }
+    private void OnGet(Cube cube)
+    {
+        cube.Init(GetRandomPosition());
+        cube.Destroyed += Release;
+    }
+
+    private void Release(Cube cube)
+    {
+        _objectPool.Release(cube);
+    }
 
     private void Update()
     {
@@ -69,35 +64,20 @@ public class CubeSpawner : MonoBehaviour
         
         while (true)
         {
-            SetRandomPoint();
-    
-            Instantiate(_cubePrefab, new Vector3(_randomPositionX, PositionY, _randomPositionZ), Quaternion.identity);
+            _objectPool.Get();
     
             yield return wait;
         }
     }
     
-    private int GetRandomDelay()
+    private Vector3 GetRandomPosition()
     {
-        int min = 2;
-        int max = 5;
-
-        return Random.Range(min, max);
-    }
+        float offsetCoefficientX = _platform.transform.localScale.x / 2;
+        float offsetCoefficientZ = _platform.transform.localScale.z / 2;
+        
+        float randomPositionX = Random.Range(_platform.transform.position.x - offsetCoefficientX, _platform.transform.position.x + offsetCoefficientX);
+        float randomPositionZ = Random.Range(- _platform.transform.position.z - offsetCoefficientZ, _platform.transform.position.z + offsetCoefficientZ);
     
-    private void SetRandomPoint()
-    {
-        //Почему создается за пределами платформы?
-        _randomPositionX = Random.Range(0, _platform.transform.localScale.x);
-        _randomPositionZ = Random.Range(0, _platform.transform.localScale.z);
+        return new Vector3(randomPositionX, PositionY, randomPositionZ);
     }
-
-    // private Vector3 SetRandomPosition()
-    // {
-    //     //Почему создается за пределами платформы?
-    //     _randomPositionX = Random.Range(0, _platform.transform.localScale.x);
-    //     _randomPositionZ = Random.Range(0, _platform.transform.localScale.z);
-    //
-    //     return new Vector3(_randomPositionX, PositionY, _randomPositionZ);
-    // }
 }
