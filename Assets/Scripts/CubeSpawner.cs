@@ -16,6 +16,7 @@ public class CubeSpawner : MonoBehaviour
     private float _randomPositionZ;
     private Vector3 _velocity = new Vector3(0f, -5f, 0f);
     private Coroutine _coroutine;
+    // private ObjectPool<Cube> _objectPool;
 
     // private void Awake()
     // {
@@ -35,7 +36,9 @@ public class CubeSpawner : MonoBehaviour
     //     new WaitForSeconds(GetRandomDelay());
     //     
     //     cube.gameObject.SetActive(false);
+    //     _objectPool.Release(cube);
     //     Destroy(cube);
+    //     
     // }
 
     // private void OnGet(Cube cube)
@@ -43,6 +46,7 @@ public class CubeSpawner : MonoBehaviour
     //     cube.transform.position = SetRandomPosition();
     //     cube.GetComponent<Rigidbody>().velocity = _velocity;
     //     cube.gameObject.SetActive(true);
+    //     _pool.Get();
     // }
 
     private void Update()
