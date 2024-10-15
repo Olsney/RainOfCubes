@@ -6,8 +6,6 @@ using Random = UnityEngine.Random;
 [RequireComponent(typeof(Rigidbody), typeof(Renderer))]
 public class Cube : MonoBehaviour
 {
-    private const float Delay = 1f;
-
     private Rigidbody _rigidbody;
     private Renderer _renderer;
     private bool _isPlatformTouched;
