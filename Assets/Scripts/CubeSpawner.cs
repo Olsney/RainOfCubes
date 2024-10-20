@@ -7,7 +7,7 @@ using Random = UnityEngine.Random;
 public class CubeSpawner : SpawnerBase<Cube>
 {
     private const float PositionY = 10;
-    
+   
     public event Action<Vector3> CubeDestroyed;
 
     private float _randomPositionX;
@@ -17,7 +17,6 @@ public class CubeSpawner : SpawnerBase<Cube>
     protected override void Release(Cube cube)
     {
         base.Release(cube);
-        print(2);
         CubeDestroyed?.Invoke(cube.transform.position);
     }
 
@@ -35,7 +34,7 @@ public class CubeSpawner : SpawnerBase<Cube>
     
     private IEnumerator Spawning()
     {
-        float delay = 1;
+        float delay = 0.5f;
     
         var wait = new WaitForSeconds(delay);
         
