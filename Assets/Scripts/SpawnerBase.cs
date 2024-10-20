@@ -1,10 +1,6 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using DefaultNamespace;
 using UnityEngine;
 using UnityEngine.Pool;
-using UnityEngine.Serialization;
 
 public abstract class SpawnerBase<T> : MonoBehaviour where T : SpawnableObject<T>
 {
@@ -13,6 +9,8 @@ public abstract class SpawnerBase<T> : MonoBehaviour where T : SpawnableObject<T
     [field: SerializeField] protected TextInfo TextInfo { get; private set; }
     
     private ObjectPool<T> _objectPool;
+    
+    protected abstract string SpawnerName { get; }
 
     private int _allCubesInHistory;
     
@@ -58,5 +56,5 @@ public abstract class SpawnerBase<T> : MonoBehaviour where T : SpawnableObject<T
     }
 
     private void UpdateTextInfo() => 
-        TextInfo.SetText(_allCubesInHistory, _objectPool.CountInactive + _objectPool.CountActive, _objectPool.CountActive, nameof(T));
+        TextInfo.SetText(_allCubesInHistory, _objectPool.CountInactive + _objectPool.CountActive, _objectPool.CountActive, SpawnerName);
 }

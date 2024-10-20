@@ -13,6 +13,8 @@ public class CubeSpawner : SpawnerBase<Cube>
     private float _randomPositionX;
     private float _randomPositionZ;
     private Coroutine _coroutine;
+    
+    protected override string SpawnerName => "CubeSpawner";
 
     protected override void Release(Cube cube)
     {
