@@ -1,17 +1,16 @@
 using System;
 using System.Collections;
+using DefaultNamespace;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(Rigidbody), typeof(Renderer))]
-public class Cube : MonoBehaviour
+public class Cube : SpawnableObject<Cube>
 {
     private Rigidbody _rigidbody;
     private Renderer _renderer;
     private bool _isPlatformTouched;
     private Color _defaultColor;
-
-    public event Action<Cube> Destroyed;
 
     private void Awake()
     {
@@ -34,12 +33,11 @@ public class Cube : MonoBehaviour
         StartCoroutine(DestroyWithDelay());
     }
     
-    public void Init(Vector3 position)
+    public override void Init()
     {
         if (_isPlatformTouched)
             _isPlatformTouched = false;
         
-        transform.position = position;
         _rigidbody.velocity = Vector3.zero;
         transform.rotation = Quaternion.identity;
         _renderer.material.color = _defaultColor;
@@ -50,15 +48,7 @@ public class Cube : MonoBehaviour
     {
         yield return new WaitForSeconds(GetRandomDelay());
 
-        Destroyed?.Invoke(this);
-    }
-
-    private int GetRandomDelay()
-    {
-        int min = 2;
-        int max = 5;
-
-        return Random.Range(min, max);
+        Disable();
     }
 
     private Color GetRandomColor() =>
