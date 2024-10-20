@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+﻿using System.Collections;
 using UnityEngine;
-using Random = UnityEngine.Random;
-using DG.Tweening;
 
 namespace DefaultNamespace
 {
@@ -26,6 +21,16 @@ namespace DefaultNamespace
             _defaultColor = _renderer.material.color;
             _targetColor = new Color(_defaultColor.r, _defaultColor.g, _defaultColor.b, 0);
         }
+        
+        public override void Init()
+        {
+            _rigidbody.velocity = Vector3.zero;
+            transform.rotation = Quaternion.identity;
+            _renderer.material.color = _defaultColor;
+            gameObject.SetActive(true);
+
+            StartCoroutine(Destroy());
+        }
 
         private IEnumerator ChangeColor()
         {
@@ -37,16 +42,6 @@ namespace DefaultNamespace
 
                 yield return null;
             }
-        }
-
-        public override void Init()
-        {
-            _rigidbody.velocity = Vector3.zero;
-            transform.rotation = Quaternion.identity;
-            _renderer.material.color = _defaultColor;
-            gameObject.SetActive(true);
-
-            StartCoroutine(Destroy());
         }
 
         private IEnumerator Destroy()
