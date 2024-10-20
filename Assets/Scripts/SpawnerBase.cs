@@ -8,11 +8,11 @@ public abstract class SpawnerBase<T> : MonoBehaviour where T : SpawnableObject<T
     [field: SerializeField] protected T Prefab { get; private set; }
     [field: SerializeField] protected TextInfo TextInfo { get; private set; }
     
+    private int _allCubesInHistory;
     private ObjectPool<T> _objectPool;
     
     protected abstract string SpawnerName { get; }
 
-    private int _allCubesInHistory;
     
     private void Awake()
     {
@@ -25,7 +25,6 @@ public abstract class SpawnerBase<T> : MonoBehaviour where T : SpawnableObject<T
         
         UpdateTextInfo();
     }
-    
     
     public void Spawn(Vector3 position)
     {

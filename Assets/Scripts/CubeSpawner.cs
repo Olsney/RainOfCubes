@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Pool;
 using Random = UnityEngine.Random;
 
 public class CubeSpawner : SpawnerBase<Cube>
@@ -16,12 +15,6 @@ public class CubeSpawner : SpawnerBase<Cube>
     
     protected override string SpawnerName => "CubeSpawner";
 
-    protected override void Release(Cube cube)
-    {
-        base.Release(cube);
-        CubeDestroyed?.Invoke(cube.transform.position);
-    }
-
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space) && _coroutine == null)
@@ -32,6 +25,12 @@ public class CubeSpawner : SpawnerBase<Cube>
             StopCoroutine(_coroutine);
             _coroutine = null;
         }
+    }
+    
+    protected override void Release(Cube cube)
+    {
+        base.Release(cube);
+        CubeDestroyed?.Invoke(cube.transform.position);
     }
     
     private IEnumerator Spawning()
@@ -47,8 +46,8 @@ public class CubeSpawner : SpawnerBase<Cube>
             yield return wait;
         }
     }
-    
-    protected Vector3 DefinePosition()
+
+    private Vector3 DefinePosition()
     {
         float offsetCoefficientX = Platform.transform.localScale.x / 2;
         float offsetCoefficientZ = Platform.transform.localScale.z / 2;

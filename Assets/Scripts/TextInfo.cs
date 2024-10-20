@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -9,7 +7,7 @@ public class TextInfo : MonoBehaviour
 
     public void SetText(int spawnedAmount, int createdAmount, int activeAmount, string objectName)
     {
-        _text.text = $"{objectName} Pool:" +
+        _text.text = $"{objectName}:" +
                      $"\nSpawned amount: {spawnedAmount} " +
                      $"\nCreated amount: {createdAmount} " +
                      $"\nActive amount: {activeAmount}";
