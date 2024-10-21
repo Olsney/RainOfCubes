@@ -6,21 +6,23 @@ using Random = UnityEngine.Random;
 public class CubeSpawner : SpawnerBase<Cube>
 {
     private const float PositionY = 10;
-   
-    public event Action<Vector3> CubeDestroyed;
-
+    private const KeyCode SpawnKey = KeyCode.Space;
+    private const KeyCode StopSpawnKey = KeyCode.F;
+    
     private float _randomPositionX;
     private float _randomPositionZ;
     private Coroutine _coroutine;
+    
+    public event Action<Vector3> CubeDestroyed;
     
     protected override string SpawnerName => "CubeSpawner";
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && _coroutine == null)
+        if (Input.GetKeyDown(SpawnKey) && _coroutine == null)
             _coroutine = StartCoroutine(Spawning());
         
-        if (Input.GetKeyDown(KeyCode.F) && _coroutine != null)
+        if (Input.GetKeyDown(StopSpawnKey) && _coroutine != null)
         {
             StopCoroutine(_coroutine);
             _coroutine = null;
