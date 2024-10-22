@@ -8,12 +8,12 @@ public abstract class SpawnerBase<T> : MonoBehaviour where T : SpawnableObject<T
     private int _allCubesInHistory;
     private ObjectPool<T> _objectPool;
     
-    public event Action<int, int, int, string> ValueChanged;
+    public event Action<SpawnerInfoKeeper> ValueChanged;
     
     [field: SerializeField] protected Platform Platform { get; private set; }
     [field: SerializeField] protected T Prefab { get; private set; }
     
-    protected abstract string SpawnerName { get; }
+    protected abstract string Name { get; }
     
     private void Awake()
     {
@@ -23,21 +23,25 @@ public abstract class SpawnerBase<T> : MonoBehaviour where T : SpawnableObject<T
             actionOnRelease: OnRelease,
             actionOnDestroy: (T) => Destroy(T.gameObject)
         );
+    }
 
-        ValueChanged?.Invoke(_allCubesInHistory, _objectPool.CountInactive + _objectPool.CountActive, _objectPool.CountActive, SpawnerName);
+    private void Start()
+    {
+        ValueChanged.Invoke(SaveInfo());
+
     }
     
     public void Spawn(Vector3 position)
     {
         _objectPool.Get().transform.position = position;
-        ValueChanged?.Invoke(_allCubesInHistory, _objectPool.CountInactive + _objectPool.CountActive, _objectPool.CountActive, SpawnerName);
+        ValueChanged.Invoke(SaveInfo());
     }
 
     private void OnRelease(T cube)
     {
         cube.gameObject.SetActive(false);
         cube.Destroyed -= Release; 
-        ValueChanged?.Invoke(_allCubesInHistory, _objectPool.CountInactive + _objectPool.CountActive, _objectPool.CountActive, SpawnerName);
+        ValueChanged.Invoke(SaveInfo());
     }
 
     private void OnGet(T spawnableObject)
@@ -46,12 +50,17 @@ public abstract class SpawnerBase<T> : MonoBehaviour where T : SpawnableObject<T
         
         spawnableObject.Init();
         spawnableObject.Destroyed += Release;
-        ValueChanged?.Invoke(_allCubesInHistory, _objectPool.CountInactive + _objectPool.CountActive, _objectPool.CountActive, SpawnerName);
+        ValueChanged.Invoke(SaveInfo());
     }
     
     protected virtual void Release(T spawnableObject)
     {
         _objectPool.Release(spawnableObject);
-        ValueChanged?.Invoke(_allCubesInHistory, _objectPool.CountInactive + _objectPool.CountActive, _objectPool.CountActive, SpawnerName);
+        ValueChanged.Invoke(SaveInfo());
     }
+
+    private SpawnerInfoKeeper SaveInfo() =>
+        new SpawnerInfoKeeper(
+            _allCubesInHistory, _objectPool.CountInactive + _objectPool.CountActive, _objectPool.CountActive,
+            Name);
 }

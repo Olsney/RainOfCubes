@@ -17,11 +17,11 @@ public class TextInfo<T> : MonoBehaviour where T : SpawnableObject<T>
         _spawner.ValueChanged -= SetText;
     }
 
-    public void SetText(int spawnedAmount, int createdAmount, int activeAmount, string objectName)
+    public void SetText(SpawnerInfoKeeper spawnerInfoKeeper)
     {
-        _text.text = $"{objectName}:" +
-                     $"\nSpawned amount: {spawnedAmount} " +
-                     $"\nCreated amount: {createdAmount} " +
-                     $"\nActive amount: {activeAmount}";
+        _text.text = $"{spawnerInfoKeeper.Name}:" +
+                     $"\nSpawned amount: {spawnerInfoKeeper.SpawnedAmount} " +
+                     $"\nCreated amount: {spawnerInfoKeeper.CreatedAmount} " +
+                     $"\nActive amount: {spawnerInfoKeeper.ActiveAmount}";
     }
 }

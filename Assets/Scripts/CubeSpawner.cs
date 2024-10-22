@@ -12,20 +12,35 @@ public class CubeSpawner : SpawnerBase<Cube>
     private float _randomPositionX;
     private float _randomPositionZ;
     private Coroutine _coroutine;
+    private bool _isSpawning = false;
     
     public event Action<Vector3> CubeDestroyed;
     
-    protected override string SpawnerName => "CubeSpawner";
+    protected override string Name => "CubeSpawner";
 
     private void Update()
     {
-        if (Input.GetKeyDown(SpawnKey) && _coroutine == null)
-            _coroutine = StartCoroutine(Spawning());
-        
-        if (Input.GetKeyDown(StopSpawnKey) && _coroutine != null)
+        HandleSpawnKey();
+        HandleStopSpawnKey();
+    }
+
+    private void HandleSpawnKey()
+    {
+        if (Input.GetKeyDown(SpawnKey) && _isSpawning == false)
+        {
+            _coroutine = StartCoroutine(Spawning()); 
+            _isSpawning = true;
+        }
+    }
+    
+    private void HandleStopSpawnKey()
+    {
+        if (Input.GetKeyDown(StopSpawnKey) && _isSpawning)
         {
             StopCoroutine(_coroutine);
             _coroutine = null;
+
+            _isSpawning = false;
         }
     }
     

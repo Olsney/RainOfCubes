@@ -4,7 +4,7 @@ namespace DefaultNamespace
 {
     public class BombSpawner : SpawnerBase<Bomb>
     {
-        protected override string SpawnerName => "BombSpawner";
+        protected override string Name => "BombSpawner";
         
         [SerializeField] private CubeSpawner _cubeSpawner;
         
