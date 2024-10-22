@@ -2,11 +2,6 @@
 {
     public class SpawnerInfoKeeper
     {
-        public int SpawnedAmount { get; }
-        public int CreatedAmount { get; }
-        public int ActiveAmount { get; }
-        public string Name { get; }
-
         public SpawnerInfoKeeper(int spawnedAmount, int createdAmount, int activeAmount, string name)
         {
             SpawnedAmount = spawnedAmount;
@@ -14,5 +9,10 @@
             ActiveAmount = activeAmount;
             Name = name;
         }
+        public int SpawnedAmount { get; }
+        public int CreatedAmount { get; }
+        public int ActiveAmount { get; }
+        public string Name { get; }
+
     }
 }
