@@ -1,82 +1,76 @@
+using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Pool;
 using Random = UnityEngine.Random;
 
-public class CubeSpawner : MonoBehaviour
+public class CubeSpawner : SpawnerBase<Cube>
 {
     private const float PositionY = 10;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-    [SerializeField] private Platform _platform;
-    [SerializeField] private Cube _cubePrefab;
-
+    private const KeyCode SpawnKey = KeyCode.Space;
+    private const KeyCode StopSpawnKey = KeyCode.F;
+    
     private float _randomPositionX;
     private float _randomPositionZ;
     private Coroutine _coroutine;
-    private ObjectPool<Cube> _objectPool;
-
-    private void Awake()
-    {
-        _platform.GetComponent<Platform>();
-        _cubePrefab.GetComponent<Cube>();
-        _objectPool = new ObjectPool<Cube>(
-            createFunc: () => Instantiate(_cubePrefab), 
-            actionOnGet: OnGet,
-            actionOnRelease: OnRelease,
-            actionOnDestroy: (cube) => Destroy(cube.gameObject)
-            );
-    }
+    private bool _isSpawning = false;
     
-    private void OnRelease(Cube cube)
-    {
-        cube.gameObject.SetActive(false);
-        cube.Destroyed -= Release;
-    }
-
-    private void OnGet(Cube cube)
-    {
-        cube.Init(GetRandomPosition());
-        cube.Destroyed += Release;
-    }
-
-    private void Release(Cube cube)
-    {
-        _objectPool.Release(cube);
-    }
+    public event Action<Vector3> CubeDestroyed;
+    
+    protected override string Name => "CubeSpawner";
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && _coroutine == null)
-            _coroutine = StartCoroutine(Spawn());
-        
-        if (Input.GetKeyDown(KeyCode.F) && _coroutine != null)
+        HandleSpawnKey();
+        HandleStopSpawnKey();
+    }
+
+    private void HandleSpawnKey()
+    {
+        if (Input.GetKeyDown(SpawnKey) && _isSpawning == false)
         {
-            StopCoroutine(_coroutine);
-            _coroutine = null;
+            _coroutine = StartCoroutine(Spawning()); 
+            _isSpawning = true;
         }
     }
     
-    private IEnumerator Spawn()
+    private void HandleStopSpawnKey()
     {
-        float delay = 1;
+        if (Input.GetKeyDown(StopSpawnKey) && _isSpawning)
+        {
+            StopCoroutine(_coroutine);
+            _coroutine = null;
+
+            _isSpawning = false;
+        }
+    }
+    
+    protected override void Release(Cube cube)
+    {
+        base.Release(cube);
+        CubeDestroyed?.Invoke(cube.transform.position);
+    }
+    
+    private IEnumerator Spawning()
+    {
+        float delay = 0.5f;
     
         var wait = new WaitForSeconds(delay);
         
         while (true)
         {
-            _objectPool.Get();
+            Spawn(DefinePosition());
     
             yield return wait;
         }
     }
-    
-    private Vector3 GetRandomPosition()
+
+    private Vector3 DefinePosition()
     {
-        float offsetCoefficientX = _platform.transform.localScale.x / 2;
-        float offsetCoefficientZ = _platform.transform.localScale.z / 2;
+        float offsetCoefficientX = Platform.transform.localScale.x / 2;
+        float offsetCoefficientZ = Platform.transform.localScale.z / 2;
         
-        float randomPositionX = Random.Range(_platform.transform.position.x - offsetCoefficientX, _platform.transform.position.x + offsetCoefficientX);
-        float randomPositionZ = Random.Range(- _platform.transform.position.z - offsetCoefficientZ, _platform.transform.position.z + offsetCoefficientZ);
+        float randomPositionX = Random.Range(Platform.transform.position.x - offsetCoefficientX, Platform.transform.position.x + offsetCoefficientX);
+        float randomPositionZ = Random.Range(- Platform.transform.position.z - offsetCoefficientZ, Platform.transform.position.z + offsetCoefficientZ);
     
         return new Vector3(randomPositionX, PositionY, randomPositionZ);
     }
